@@ -3,6 +3,7 @@
 ## 项目概述
 
 本项目是一个基于.NET 8.0的WPF MVVM应用程序，展示了WPF中六种高级绑定技术的实现和应用场景。通过这些示例，开发者可以深入理解WPF的数据绑定机制，并在实际项目中灵活运用这些技术。
+![image](https://github.com/user-attachments/assets/12db871f-c0b8-4c04-82ff-cf38a4270bff)
 
 ## 主要功能
 
