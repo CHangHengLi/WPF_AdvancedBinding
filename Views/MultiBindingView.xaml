@@ -1,0 +1,121 @@
+<UserControl
+    x:Class="WpfAdvancedBindingDemo.Views.MultiBindingView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:WpfAdvancedBindingDemo.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:WpfAdvancedBindingDemo.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    Background="AntiqueWhite"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <converters:RgbToColorConverter x:Key="RgbToColorConverter" />
+    </UserControl.Resources>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!--  标题  -->
+        <TextBlock
+            Grid.Row="0"
+            Grid.ColumnSpan="2"
+            Margin="0,0,0,20"
+            FontSize="22"
+            FontWeight="Bold"
+            Text="多重绑定 (MultiBinding) 示例" />
+
+        <!--  红色滑块  -->
+        <TextBlock
+            Grid.Row="1"
+            Grid.Column="0"
+            VerticalAlignment="Center"
+            Text="红色：" />
+        <Slider
+            Grid.Row="1"
+            Grid.Column="1"
+            IsSnapToTickEnabled="True"
+            Maximum="255"
+            Minimum="0"
+            TickFrequency="1"
+            Value="{Binding RedValue}" />
+
+        <!--  绿色滑块  -->
+        <TextBlock
+            Grid.Row="2"
+            Grid.Column="0"
+            VerticalAlignment="Center"
+            Text="绿色：" />
+        <Slider
+            Grid.Row="2"
+            Grid.Column="1"
+            IsSnapToTickEnabled="True"
+            Maximum="255"
+            Minimum="0"
+            TickFrequency="1"
+            Value="{Binding GreenValue}" />
+
+        <!--  蓝色滑块  -->
+        <TextBlock
+            Grid.Row="3"
+            Grid.Column="0"
+            VerticalAlignment="Center"
+            Text="蓝色：" />
+        <Slider
+            Grid.Row="3"
+            Grid.Column="1"
+            IsSnapToTickEnabled="True"
+            Maximum="255"
+            Minimum="0"
+            TickFrequency="1"
+            Value="{Binding BlueValue}" />
+
+        <!--  颜色预览矩形  -->
+        <Border
+            Grid.Row="4"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Margin="0,20,0,0"
+            BorderBrush="Black"
+            BorderThickness="1">
+            <Border.Background>
+                <SolidColorBrush>
+                    <SolidColorBrush.Color>
+                        <!--  使用MultiBinding绑定三个滑块的值  -->
+                        <MultiBinding Converter="{StaticResource RgbToColorConverter}">
+                            <Binding Path="RedValue" />
+                            <Binding Path="GreenValue" />
+                            <Binding Path="BlueValue" />
+                        </MultiBinding>
+                    </SolidColorBrush.Color>
+                </SolidColorBrush>
+            </Border.Background>
+
+            <!--  显示RGB值的文本  -->
+            <TextBlock
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                FontSize="16">
+                <TextBlock.Text>
+                    <MultiBinding StringFormat="RGB({0:N0}, {1:N0}, {2:N0})">
+                        <Binding Path="RedValue" />
+                        <Binding Path="GreenValue" />
+                        <Binding Path="BlueValue" />
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
+        </Border>
+    </Grid>
+</UserControl> 

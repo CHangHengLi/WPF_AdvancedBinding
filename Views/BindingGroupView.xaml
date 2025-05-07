@@ -1,0 +1,276 @@
+<UserControl
+    x:Class="WpfAdvancedBindingDemo.Views.BindingGroupView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:WpfAdvancedBindingDemo.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:WpfAdvancedBindingDemo.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    Background="AntiqueWhite"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <converters:PasswordMatchRule x:Key="PasswordMatchRule" />
+        <converters:StringIsNullOrEmptyConverter x:Key="StringIsNullOrEmptyConverter" />
+        <!--  受HasTriedSubmit控制的验证错误模板  -->
+        <ControlTemplate x:Key="ConditionalValidationTemplate">
+            <StackPanel Orientation="Horizontal">
+                <AdornedElementPlaceholder x:Name="placeholder" />
+                <TextBlock
+                    Margin="5,0,0,0"
+                    VerticalAlignment="Center"
+                    Foreground="Red"
+                    Text="!"
+                    ToolTip="输入有误">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=placeholder, Path=AdornedElement.(Validation.Errors).Count}" Value="0">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </StackPanel>
+        </ControlTemplate>
+        <!--  用于HasTriedSubmit到Visibility的转换器  -->
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    </UserControl.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock
+            Grid.Row="0"
+            Margin="0,0,0,20"
+            FontSize="22"
+            FontWeight="Bold"
+            Text="绑定群组 (BindingGroup) 示例" />
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!--  注册表单  -->
+            <Border
+                Grid.Column="0"
+                MaxWidth="400"
+                Margin="0,0,10,0"
+                Padding="20"
+                VerticalAlignment="Top"
+                Background="#F5F5F5">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <!--  默认边框  -->
+                        <Setter Property="BorderBrush" Value="#DDDDDD" />
+                        <Setter Property="BorderThickness" Value="1" />
+                        <Style.Triggers>
+                            <!--  有验证错误时显示红色边框  -->
+                            <DataTrigger Binding="{Binding ValidationError, Converter={StaticResource StringIsNullOrEmptyConverter}}" Value="False">
+                                <Setter Property="BorderBrush" Value="#E53935" />
+                                <Setter Property="BorderThickness" Value="2" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!--  表单标题  -->
+                    <TextBlock
+                        Grid.Row="0"
+                        Margin="0,0,0,15"
+                        FontSize="18"
+                        FontWeight="SemiBold"
+                        Text="用户注册表单" />
+
+                    <!--  绑定群组 - 批量验证和更新  -->
+                    <Grid
+                        x:Name="formGrid"
+                        Grid.Row="1"
+                        Grid.RowSpan="3">
+                        <Grid.BindingGroup>
+                            <BindingGroup Name="registerForm" NotifyOnValidationError="True">
+                                <BindingGroup.ValidationRules>
+                                    <converters:PasswordMatchRule ValidationStep="UpdatedValue" />
+                                </BindingGroup.ValidationRules>
+                            </BindingGroup>
+                        </Grid.BindingGroup>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!--  用户名  -->
+                        <TextBlock
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Margin="0,0,10,0"
+                            VerticalAlignment="Center"
+                            Text="用户名:" />
+                        <TextBox
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Text="{Binding User.Username, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}">
+                            <TextBox.Style>
+                                <Style BasedOn="{StaticResource {x:Type TextBox}}" TargetType="TextBox">
+                                    <Setter Property="Validation.ErrorTemplate" Value="{StaticResource ConditionalValidationTemplate}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasTriedSubmit}" Value="False">
+                                            <Setter Property="Validation.ErrorTemplate" Value="{x:Null}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBox.Style>
+                        </TextBox>
+
+                        <!--  邮箱  -->
+                        <TextBlock
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Margin="0,0,10,0"
+                            VerticalAlignment="Center"
+                            Text="邮箱:" />
+                        <TextBox
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Text="{Binding User.Email, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}">
+                            <TextBox.Style>
+                                <Style BasedOn="{StaticResource {x:Type TextBox}}" TargetType="TextBox">
+                                    <Setter Property="Validation.ErrorTemplate" Value="{StaticResource ConditionalValidationTemplate}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasTriedSubmit}" Value="False">
+                                            <Setter Property="Validation.ErrorTemplate" Value="{x:Null}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBox.Style>
+                        </TextBox>
+
+                        <!--  密码  -->
+                        <TextBlock
+                            Grid.Row="2"
+                            Grid.Column="0"
+                            Margin="0,0,10,0"
+                            VerticalAlignment="Center"
+                            Text="密码:" />
+                        <PasswordBox
+                            x:Name="passwordBox"
+                            Grid.Row="2"
+                            Grid.Column="1">
+                            <PasswordBox.Tag>
+                                <Binding
+                                    Mode="TwoWay"
+                                    Path="User.Password"
+                                    UpdateSourceTrigger="PropertyChanged" />
+                            </PasswordBox.Tag>
+                        </PasswordBox>
+
+                        <!--  确认密码  -->
+                        <TextBlock
+                            Grid.Row="3"
+                            Grid.Column="0"
+                            Margin="0,0,10,0"
+                            VerticalAlignment="Center"
+                            Text="确认密码:" />
+                        <PasswordBox
+                            x:Name="confirmPasswordBox"
+                            Grid.Row="3"
+                            Grid.Column="1">
+                            <PasswordBox.Tag>
+                                <Binding
+                                    Mode="TwoWay"
+                                    Path="User.ConfirmPassword"
+                                    UpdateSourceTrigger="PropertyChanged" />
+                            </PasswordBox.Tag>
+                        </PasswordBox>
+                    </Grid>
+
+                    <!--  操作按钮 - 移出formGrid，放在父Grid中  -->
+                    <StackPanel
+                        Grid.Row="4"
+                        Margin="0,15,0,0"
+                        Panel.ZIndex="100"
+                        Orientation="Horizontal">
+                        <Button
+                            x:Name="submitButton"
+                            Width="80"
+                            Height="35"
+                            Margin="0,0,10,0"
+                            Panel.ZIndex="200"
+                            Background="#4CAF50"
+                            Click="SubmitButton_Click"
+                            Content="提交"
+                            FontWeight="SemiBold"
+                            Foreground="White" />
+                        <Button
+                            x:Name="resetButton"
+                            Width="80"
+                            Height="35"
+                            Margin="10,0,0,0"
+                            Panel.ZIndex="200"
+                            Background="#F44336"
+                            Click="ResetButton_Click"
+                            Content="重置"
+                            FontWeight="SemiBold"
+                            Foreground="White" />
+                    </StackPanel>
+
+                    <!--  验证错误提示  -->
+                    <TextBlock
+                        Grid.Row="5"
+                        MinHeight="40"
+                        MaxWidth="350"
+                        Margin="0,10,0,0"
+                        FontWeight="SemiBold"
+                        Foreground="Red"
+                        Text="{Binding ValidationError}"
+                        TextWrapping="Wrap" />
+                </Grid>
+            </Border>
+
+            <!--  说明文本  -->
+            <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                <TextBlock
+                    Margin="0,0,0,10"
+                    FontSize="16"
+                    FontWeight="Bold"
+                    Text="绑定群组说明" />
+                <TextBlock TextWrapping="Wrap">
+                    <Run>BindingGroup允许将多个绑定分组，实现批量验证和更新。</Run><LineBreak />
+                    <Run>主要特点：</Run><LineBreak />
+                    <Run>1. 批量验证 - 同时验证多个字段，如密码匹配</Run><LineBreak />
+                    <Run>2. 批量更新 - 一次性提交多个字段的更改</Run><LineBreak />
+                    <Run>3. 事务性 - 全部验证通过才提交，否则回滚</Run><LineBreak />
+                    <LineBreak />
+                    <Run>本示例中：</Run><LineBreak />
+                    <Run>- 所有表单字段被包含在一个BindingGroup中</Run><LineBreak />
+                    <Run>- 提交时，验证所有字段并检查密码匹配</Run><LineBreak />
+                    <Run>- 只有全部验证通过才会提交表单</Run>
+                </TextBlock>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl> 
